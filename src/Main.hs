@@ -3,10 +3,10 @@ module Main(main) where
 import Network.Wai              (Application)
 import Network.Wai.Handler.Warp (run)
 import Servant                  (serve)
-import StorageServer
+import App.MainServer
 
 app :: Application
-app = serve storageAPI storageServer
+app = serve mainAPI mainServer
 
 main :: IO ()
 main = run 8081 app

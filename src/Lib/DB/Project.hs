@@ -1,61 +1,16 @@
 {-#LANGUAGE OverloadedStrings #-}
 
-module StorageDB(getTenants,findTenant,insertTenant,deleteTenant,
-          getProjectListForTenant,findProject,insertProject,deleteProject,
-          buildDatabase) where
+module Lib.DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject) where
 
 import Models
-import DB
+import Lib.DB
 import Database.SQLite.Simple.FromField(fromField)
-
-dbName = "test.db"
-
-instance FromRow Tenant where
-    fromRow = Tenant <$> field <*> field
 
 instance FromRow ProjectListItem where
     fromRow = ProjectListItem <$> field <*> field <*> field
 
 instance FromRow Project where
   fromRow = Project <$> field <*> field <*> field <*> field
-
-buildDatabase :: IO String
-buildDatabase = do
-  conn <- open dbName
-  execute_ conn "CREATE TABLE IF NOT EXISTS tenant (\
-                    \id INTEGER PRIMARY KEY, \
-                    \name TEXT)"
-  execute_ conn "CREATE TABLE IF NOT EXISTS project (\
-                    \id INTEGER PRIMARY KEY, \
-                    \tenantId INTEGER, \
-                    \description TEXT, \
-                    \content TEXT)"
-  return $ "database " ++ dbName ++ " created."
-
-findTenant :: TenantId -> IO (Maybe Tenant)
-findTenant tId = do
-  conn <- open dbName
-  findTenant' conn tId
-
-insertTenant :: Tenant -> IO (Maybe Tenant)
-insertTenant (Tenant _id name) = do
-     conn <- open dbName
-     execute conn "INSERT INTO tenant(name) values (?)" [name]
-     tId <- lastInsertRowId conn
-     findTenant' conn $ fromIntegral tId
-
-findTenant' :: Connection -> TenantId -> IO (Maybe Tenant)
-findTenant' conn tId = do
-  r <- find conn "select id,name from tenant where id = ?" ( Only tId)
-  close conn
-  return r
-
-deleteTenant :: TenantId -> IO TenantId
-deleteTenant tId = do
-  conn <- open dbName
-  execute conn "DELETE FROM tenant WHERE id = ? " [tId]
-  close conn
-  return tId
 
 findProject' :: Connection -> TenantId -> ProjectId -> IO (Maybe Project)
 findProject' conn tId pId = do
@@ -89,13 +44,6 @@ deleteProject tId pId = do
                 \AND id = ? " [tId,pId]
   close conn
   return pId
-
-getTenants :: IO [Tenant]
-getTenants = do
-  conn <- open dbName
-  t <- query_ conn "select id,name from tenant" -- ::IO [Tenant]
-  close conn
-  return t
 
 getProjectListForTenant :: TenantId -> IO [ProjectListItem]
 getProjectListForTenant tId = do
