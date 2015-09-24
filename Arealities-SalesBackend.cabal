@@ -22,8 +22,8 @@ executable Arealities-SalesBackend
   other-extensions:    DataKinds, TypeOperators, DeriveGeneric
   build-depends:       base >=4.8 && <4.9,
                        wai >=3.0 && <3.1,
-                       servant >=0.4 && <1.0,
-                       servant-server >=0.4 && <1.0,
+                       servant,
+                       servant-server,
                        aeson >= 0.9 && <1.0,
                        warp >=3.1 && < 4.0,
                        either >= 4.4.1 && < 5.0,

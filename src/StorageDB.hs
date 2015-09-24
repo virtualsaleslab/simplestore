@@ -46,7 +46,7 @@ insertTenant (Tenant _id name) = do
 
 findTenant' :: Connection -> TenantId -> IO (Maybe Tenant)
 findTenant' conn tId = do
-  r <- find conn "select * from tenant where id = ?" ( Only tId)
+  r <- find conn "select id,name from tenant where id = ?" ( Only tId)
   close conn
   return r
 
@@ -93,7 +93,7 @@ deleteProject tId pId = do
 getTenants :: IO [Tenant]
 getTenants = do
   conn <- open dbName
-  t <- query_ conn "select * from tenant" -- ::IO [Tenant]
+  t <- query_ conn "select id,name from tenant" -- ::IO [Tenant]
   close conn
   return t
 

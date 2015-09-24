@@ -24,8 +24,8 @@ instance FromJSON Tenant
 type Tenants = [Tenant]
 
 data Project = Project
-  { projectTenantId    :: TenantId
-  , projectId          :: ProjectId
+  { projectId          :: ProjectId
+  , projectTenantId    :: TenantId
   , projectDescription :: Description
   , projectContent     :: Content
   }
@@ -35,8 +35,8 @@ instance ToJSON Project
 instance FromJSON Project
 
 data ProjectListItem = ProjectListItem
-  { projectListItemTenantId    :: TenantId
-  , projectListItemId          :: ProjectId
+  { projectListItemId          :: ProjectId
+  , projectListItemTenantId    :: TenantId
   , projectListItemDescription :: Description
   }
   deriving Show
@@ -44,8 +44,8 @@ data ProjectListItem = ProjectListItem
 type ProjectList = [ProjectListItem]
 
 instance ToJSON ProjectListItem where
-  toJSON(ProjectListItem tenantId projectId description) =
-    object [ "tentantId"   .= tenantId
-           , "projectId"   .= projectId
+  toJSON(ProjectListItem projectId tenantId description) =
+    object [ "projectId"   .= projectId
+           , "tentantId"   .= tenantId
            , "description" .= description
            ]
