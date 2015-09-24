@@ -27,15 +27,15 @@ type StorageAPI =  "tenants" :> TenantAPI
 projectServer :: TenantId -> Server ProjectAPI
 projectServer tId =
                liftIO (getProjectListForTenant tId)
-          :<|> liftIOMaybeToEither err404 . findProject tId
-          :<|> liftIOMaybeToEither err400 . insertProject
+          :<|> liftIOMaybeToExceptT err404 . findProject tId
+          :<|> liftIOMaybeToExceptT err400 . insertProject
           :<|> liftIO . deleteProject tId
 
 tenantServer :: Server TenantAPI
 tenantServer = projectServer
           :<|> liftIO getTenants
-          :<|> liftIOMaybeToEither err404 . findTenant
-          :<|> liftIOMaybeToEither err400 . insertTenant
+          :<|> liftIOMaybeToExceptT err404 . findTenant
+          :<|> liftIOMaybeToExceptT err400 . insertTenant
           :<|> liftIO . deleteTenant
 
 adminServer :: Server AdminAPI
