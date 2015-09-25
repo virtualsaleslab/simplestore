@@ -1,9 +1,8 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Models where
+module Domain.Models where
 
-import           Data.Aeson   (FromJSON, ToJSON, object, toJSON, (.=))
 import           GHC.Generics (Generic)
 
 type Name = String
@@ -18,9 +17,6 @@ data Tenant = Tenant
   }
   deriving (Show,Eq,Generic)
 
-instance ToJSON Tenant
-instance FromJSON Tenant
-
 type Tenants = [Tenant]
 
 data Project = Project
@@ -31,8 +27,6 @@ data Project = Project
   }
   deriving (Show,Eq,Generic)
 
-instance ToJSON Project
-instance FromJSON Project
 
 data ProjectListItem = ProjectListItem
   { projectListItemId          :: ProjectId
@@ -42,10 +36,3 @@ data ProjectListItem = ProjectListItem
   deriving Show
 
 type ProjectList = [ProjectListItem]
-
-instance ToJSON ProjectListItem where
-  toJSON(ProjectListItem projectId tenantId description) =
-    object [ "projectId"   .= projectId
-           , "tentantId"   .= tenantId
-           , "description" .= description
-           ]

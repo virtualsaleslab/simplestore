@@ -2,7 +2,7 @@
 
 module Lib.DB.Admin(buildDatabase) where
 
-import Models
+import Domain.Models
 import Lib.DB
 import Database.SQLite.Simple.FromField(fromField)
 

@@ -2,7 +2,7 @@
 
 module Lib.DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject) where
 
-import Models
+import Domain.Models
 import Lib.DB
 import Database.SQLite.Simple.FromField(fromField)
 

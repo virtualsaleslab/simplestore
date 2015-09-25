@@ -5,8 +5,12 @@ module App.TenantServer(TenantAPI,tenantServer) where
 
 import           Lib.DB.Tenant
 import           Lib.ServantHelpers
-import           Models
+import           Domain.Models
 import           Servant.API
+import           Data.Aeson   (FromJSON, ToJSON)
+
+instance ToJSON Tenant
+instance FromJSON Tenant
 
 type TenantAPI  =  "tenants" :> (
                    Get '[JSON] Tenants
@@ -16,6 +20,6 @@ type TenantAPI  =  "tenants" :> (
 
 tenantServer :: Server TenantAPI
 tenantServer = liftIO getTenants
-          :<|> liftIOMaybeToExceptT err404 . findTenant
-          :<|> liftIOMaybeToExceptT err400 . insertTenant
+          :<|> maybeErr err404 . liftIO . findTenant
+          :<|> maybeErr err400 . liftIO . insertTenant
           :<|> liftIO . deleteTenant
