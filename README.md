@@ -21,7 +21,7 @@ instructions:
     $ git clone git@github.com:arealities/servant.git
     $ cabal sandbox init
     $ cabal sandbox add-source servant/servant
-    $ cabal sandbox add-source $ servant/servant-server
+    $ cabal sandbox add-source servant/servant-server
     $ cabal install --only-dependencies
     $ cabal build
 
