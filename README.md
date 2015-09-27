@@ -55,7 +55,3 @@ Also, if you use `GHC` on windows, get the latest installer from https://www.has
     $ fg
     cabal run
     ^C
-
-# License
-
-As usual it's WTFPL.
