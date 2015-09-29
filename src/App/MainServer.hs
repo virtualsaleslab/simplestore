@@ -4,22 +4,23 @@
 module App.MainServer where
 
 import           App.AdminServer
+import           App.AuthServer
 import           App.ProjectServer
 import           App.TenantServer
-import           App.AuthServer
 import           Lib.ServantHelpers
 import           Servant.API
 
-type MainAPI =  TenantAPI
-           :<|> ProjectAPI
-           :<|> AdminAPI
+type MainAPI =  AdminAPI
            :<|> AuthAPI
+           :<|> ProjectAPI
+           :<|> TenantAPI
+
 
 mainAPI :: Proxy MainAPI
 mainAPI = Proxy
 
 mainServer :: Server MainAPI
-mainServer =    tenantServer
-           :<|> projectServer
-           :<|> adminServer
+mainServer =    adminServer
            :<|> authServer
+           :<|> projectServer
+           :<|> tenantServer

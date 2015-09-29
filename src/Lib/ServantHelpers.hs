@@ -1,14 +1,18 @@
-module Lib.ServantHelpers(Server,Proxy(..),err400, err401, err404,liftIO,throwE,maybeErr) where
+module Lib.ServantHelpers(Server,Proxy(..),err400, err401, err404,liftIO,ioMaybeToExceptT,maybeToExceptT) where
 
-import Control.Monad.IO.Class     (MonadIO, liftIO)
-import Control.Monad.Trans.Except
-import Servant(ServantErr,Proxy(..))
-import Servant.Server
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Control.Monad.Trans.Except (ExceptT, throwE)
+import           Servant                    (Proxy (..), ServantErr)
+import           Servant.Server
 
-
-maybeErr ::  (MonadIO m) => a -> IO (Maybe b) -> ExceptT a m b
-maybeErr err x = do
-    m <- liftIO x
-    case m of
-      Nothing -> throwE err
+maybeToExceptT :: MonadIO m => e -> Maybe t -> ExceptT e m t
+maybeToExceptT err x =
+    case x of
       Just v -> return v
+      Nothing -> throwE err
+
+
+ioMaybeToExceptT :: MonadIO m => e -> IO (Maybe t) -> ExceptT e m t
+ioMaybeToExceptT err x = do
+    m <- liftIO x
+    maybeToExceptT err m

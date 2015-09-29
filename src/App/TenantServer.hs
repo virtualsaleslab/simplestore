@@ -20,6 +20,6 @@ type TenantAPI  =  "tenants" :> (
 
 tenantServer :: Server TenantAPI
 tenantServer = liftIO getTenants
-          :<|> maybeErr err404 . liftIO . findTenant
-          :<|> maybeErr err400 . liftIO . insertTenant
+          :<|> ioMaybeToExceptT err404 . findTenant
+          :<|> ioMaybeToExceptT err400 . insertTenant
           :<|> liftIO . deleteTenant

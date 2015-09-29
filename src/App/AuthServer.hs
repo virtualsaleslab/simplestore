@@ -1,15 +1,15 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module App.AuthServer(AuthAPI,authServer) where
 
-import Lib.ServantHelpers
-import Data.Aeson
-import           GHC.Generics (Generic)
-import Servant.API
-import Control.Monad.Trans.Except(throwE)
+import           Control.Monad.Trans.Except (throwE)
+import           Data.Aeson
+import           GHC.Generics               (Generic)
+import           Lib.ServantHelpers
+import           Servant.API
 
 data UserPass = UserPass
   { username:: String

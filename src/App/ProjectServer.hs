@@ -1,14 +1,14 @@
-{-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
-module App.ProjectServer(ProjectAPI,projectServer) where
+module App.ProjectServer(ProjectAPI,projectServer,ioMaybeToExceptT) where
 
+import           Data.Aeson         (FromJSON, ToJSON, object, toJSON, (.=))
+import           Domain.Models
 import           Lib.DB.Project
 import           Lib.ServantHelpers
-import           Domain.Models
 import           Servant.API
-import           Data.Aeson   (FromJSON, ToJSON, object, toJSON, (.=))
 
 instance ToJSON Project
 instance FromJSON Project
@@ -27,10 +27,11 @@ type ProjectAPI  =  "tenants" :> Capture "tId" TenantId :> "projects" :> (
                :<|> Capture "pId" ProjectId :> Delete '[JSON] ProjectId
                )
 
+
 projectServer :: Server ProjectAPI
 projectServer = projectServerForTenant
   where projectServerForTenant tId =
                  liftIO (getProjectListForTenant tId)
-            :<|> maybeErr err404 . findProject tId
-            :<|> maybeErr err400 . insertProject
+            :<|> ioMaybeToExceptT err404 . findProject tId
+            :<|> ioMaybeToExceptT err400 . insertProject
             :<|> liftIO . deleteProject tId
