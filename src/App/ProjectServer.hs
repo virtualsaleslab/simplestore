@@ -24,7 +24,8 @@ type ProjectAPI  =  "tenants" :> Capture "tId" TenantId :> "projects" :> (
                     Get '[JSON] ProjectList
                :<|> Capture "pId" ProjectId :> Get '[JSON] Project
                :<|> ReqBody '[JSON] Project :> Post '[JSON] Project
-               :<|> Capture "pId" ProjectId :> Delete '[JSON] ProjectId )
+               :<|> Capture "pId" ProjectId :> Delete '[JSON] ProjectId
+               )
 
 projectServer :: Server ProjectAPI
 projectServer = projectServerForTenant

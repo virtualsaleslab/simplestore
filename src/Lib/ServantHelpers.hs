@@ -1,4 +1,4 @@
-module Lib.ServantHelpers(Server,Proxy(..),err400, err404,liftIO,maybeErr) where
+module Lib.ServantHelpers(Server,Proxy(..),err400, err401, err404,liftIO,throwE,maybeErr) where
 
 import Control.Monad.IO.Class     (MonadIO, liftIO)
 import Control.Monad.Trans.Except
