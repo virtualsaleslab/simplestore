@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib.Authorization.Claims(claimsToToken,verifyClaims,AuthHeader) where
+module Lib.Authorization.Claims(claimsToToken,verifyClaims,maybeTokenToClaims,AuthHeader) where
 
 import           Data.Aeson    (Value (Bool))
 import           Data.List     (intersect)
