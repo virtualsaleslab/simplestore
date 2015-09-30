@@ -11,6 +11,8 @@ type Content = String
 type TenantId = Int
 type ProjectId = Int
 
+type IdentityId = String
+
 data Tenant = Tenant
   { tenantId   :: TenantId
   , tenantName :: Name

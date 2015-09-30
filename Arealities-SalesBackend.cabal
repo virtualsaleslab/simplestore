@@ -30,9 +30,10 @@ executable Arealities-SalesBackend
                        transformers >= 0.4.2 && < 1.0,
                        mtl >= 2.2.1 && < 3.0,
                        sqlite-simple >= 0.4.9 && < 1.0,
-                       http-types,
                        bytestring,
-                       jwt
+                       text,
+                       jwt,
+                       containers
   hs-source-dirs:      src
                        servant
   default-language:    Haskell2010

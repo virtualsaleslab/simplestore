@@ -5,58 +5,50 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
+
 module App.AuthServer(AuthAPI,authServer) where
 
 import           Control.Monad.Trans.Except (throwE)
 import           Data.Aeson
-import           Data.ByteString.Char8      (unpack)
 import           GHC.Generics               (Generic)
 import           Lib.ServantHelpers
 import           Servant                    (ServerT, route)
 import           Servant.API
-import           Servant.Server.Internal    (HasServer, RouteMismatch (..),
-                                             Router (..), failWith)
 
-import           Network.HTTP.Types         (status401, status403)
-import           Network.Wai                (requestHeaders)
+import qualified Web.JWT as  JWT
+import Data.Text(Text,pack,unpack)
+
+import Lib.Authentication;
+import Lib.Authorization;
+
+import Data.Map.Lazy(fromList,toList)
 
 
 
-data UserPass = UserPass
+data User = User
   { username:: String
   , password:: String
   } deriving Generic
 
-data AuthProtected
-
-instance HasServer rest => HasServer (AuthProtected :> rest) where
-  type ServerT (AuthProtected :> rest) m = ServerT rest m
-
-  route Proxy a = WithRequest $ \ request ->
-    route (Proxy :: Proxy rest) $
-      case lookup "Auth" (requestHeaders request) of
-        Nothing -> return $ failWith $ HttpError status401 (Just "Missing auth header.")
-        Just v  -> if isValidToken $ unpack v
-            then a
-            else return $ failWith $ HttpError status403 (Just "Invalid auth header.")
-
-
-instance FromJSON UserPass
+instance FromJSON User
 
 data Token = Token
-    { token :: String
+    { token :: Data.Text.Text
     } deriving Generic
 
 instance ToJSON Token
 
 type AuthAPI = "auth" :> (
-                       "logon" :> ReqBody '[JSON] UserPass :> Post '[JSON] Token
-                  :<|> "logoff" :>  Header "Auth" String:> Post '[JSON] String
+                       "logon" :> ReqBody '[JSON] User :> Post '[JSON] Token
+                  :<|> "logoff" :>  Header "Auth" String :> Post '[JSON] String
                 )
 
-getToken :: UserPass -> Maybe Token
-getToken UserPass {username = "Tom", password= "pass"} = Just Token { token="123456"}
-getToken _ = Nothing
+getToken :: User -> Maybe Token
+getToken User {username = u, password= p} =
+    case claims of
+      [] -> Nothing
+      x -> Just . claimsToToken $ claims
+    where claims = maybeIdentityToClaims $ maybeUserIdentity u p
 
 logOff ::  Maybe String -> Maybe String
 logOff (Just "123456") = Just "Succes"
@@ -67,5 +59,27 @@ isValidToken "123456" = True
 isValidToken _ = False
 
 authServer :: Server AuthAPI
-authServer = maybe (throwE err401) return . getToken
-        :<|> maybe (throwE err400) return . logOff
+authServer = ioMaybeToExceptT err401 . return . getToken
+        :<|> ioMaybeToExceptT err401 . return . logOff
+
+tokenKey :: Text
+tokenKey = "secret-key"
+
+claimsToToken :: [Claim] -> Token
+claimsToToken claims = Token {token = encodedClaims}
+  where encodedClaims = JWT.encodeSigned JWT.HS256 key cs
+        cs = JWT.def { JWT.iss = JWT.stringOrURI "Foo"
+                     , JWT.unregisteredClaims = fromList . map claimToText $ claims
+                     }
+        key = JWT.secret tokenKey
+        claimToText x = (pack . show $ x ,Bool True)
+
+maybeTokenToClaims :: Maybe Text -> [Claim]
+maybeTokenToClaims Nothing = []
+maybeTokenToClaims (Just token) = case JWT.decodeAndVerifySignature key token of
+    Just verifiedClaims ->
+      map textToClaim . toList . JWT.unregisteredClaims . JWT.claims $ verifiedClaims
+    Nothing -> []
+  where key = JWT.secret tokenKey
+        textToClaim :: (Text,a) -> Claim
+        textToClaim (x,_)= read $ unpack x
