@@ -1,6 +1,6 @@
 {-#LANGUAGE OverloadedStrings #-}
 
-module Lib.DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject) where
+module DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject) where
 
 import Domain.Models
 import Lib.DB

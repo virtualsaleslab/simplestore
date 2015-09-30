@@ -3,7 +3,7 @@
 
 module App.TenantServer(TenantAPI,tenantServer) where
 
-import           Lib.DB.Tenant
+import           DB.Tenant
 import           Lib.ServantHelpers
 import           Domain.Models
 import           Servant.API

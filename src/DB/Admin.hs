@@ -1,6 +1,6 @@
 {-#LANGUAGE OverloadedStrings #-}
 
-module Lib.DB.Admin(buildDatabase) where
+module DB.Admin(buildDatabase) where
 
 import Domain.Models
 import Lib.DB

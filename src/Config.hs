@@ -1,4 +1,4 @@
-module App.Config where
+module Config where
 
 tokenKey :: String
 tokenKey = "secret-key"

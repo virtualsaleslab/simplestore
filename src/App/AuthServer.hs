@@ -5,11 +5,11 @@
 
 module App.AuthServer(AuthAPI,authServer) where
 
-import           App.Config               (tokenKey)
+import           Config                   (tokenKey)
 import           Data.Aeson
-import           Domain.Authorization     (maybeIdentityToClaims)
+import           DB.Authentication        (maybeUserIdentity)
+import           DB.Authorization         (maybeIdentityToClaims)
 import           GHC.Generics             (Generic)
-import           Lib.Authentication       (maybeUserIdentity)
 import           Lib.Authorization.Claims (claimsToToken)
 import           Lib.ServantHelpers
 import           Servant.API

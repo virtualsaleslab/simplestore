@@ -1,6 +1,6 @@
-module Lib.Authentication where
+module DB.Authentication where
 
-import           Domain.Models (IdentityId)
+import           Domain.Authentication (IdentityId)
 
 -- TODO: get this from DB/google docs/whatever...
 maybeUserIdentity :: String -> String -> Maybe IdentityId

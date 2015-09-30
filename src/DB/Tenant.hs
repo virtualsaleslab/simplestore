@@ -1,6 +1,6 @@
 {-#LANGUAGE OverloadedStrings #-}
 
-module Lib.DB.Tenant(getTenants,findTenant,insertTenant,deleteTenant) where
+module DB.Tenant(getTenants,findTenant,insertTenant,deleteTenant) where
 
 import Domain.Models
 import Lib.DB
