@@ -13,7 +13,6 @@ data ProjectRole = ProjectEditor | ProjectReviewer deriving (Eq,Show,Read)
 data Claim = TenantClaim TenantRole TenantSpec
           | ProjectClaim  ProjectRole ProjectSpec
           | IdentityClaim IdentityId
-          | OrganisationClaim TenantId
           | SuperAdmin
           deriving (Eq,Show,Read)
 
