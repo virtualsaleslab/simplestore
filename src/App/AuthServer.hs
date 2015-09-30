@@ -6,14 +6,15 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module App.AuthServer(AuthAPI,authServer) where
+module App.AuthServer(AuthAPI,authServer,AuthHeader,verifyClaims) where
 
-import           Control.Monad.Trans.Except (throwE)
+import           Control.Monad.Trans.Except (ExceptT, throwE)
 import           Data.Aeson
 import           GHC.Generics               (Generic)
 import           Lib.ServantHelpers
-import           Servant                    (ServerT, route)
+import           Servant                    (ServerT, ServantErr)
 import           Servant.API
+import  Control.Monad.IO.Class
 
 import qualified Web.JWT as  JWT
 import Data.Text(Text,pack,unpack)
@@ -38,9 +39,10 @@ data Token = Token
 
 instance ToJSON Token
 
+type AuthHeader =  Header "Auth" String
+
 type AuthAPI = "auth" :> (
-                       "logon" :> ReqBody '[JSON] User :> Post '[JSON] Token
-                  :<|> "logoff" :>  Header "Auth" String :> Post '[JSON] String
+                       "token" :> ReqBody '[JSON] User :> Post '[JSON] Token
                 )
 
 getToken :: User -> Maybe Token
@@ -50,20 +52,14 @@ getToken User {username = u, password= p} =
       x -> Just . claimsToToken $ claims
     where claims = maybeIdentityToClaims $ maybeUserIdentity u p
 
-logOff ::  Maybe String -> Maybe String
-logOff (Just "123456") = Just "Succes"
-logOff _  = Nothing
-
-isValidToken :: String -> Bool
-isValidToken "123456" = True
-isValidToken _ = False
-
 authServer :: Server AuthAPI
 authServer = ioMaybeToExceptT err401 . return . getToken
-        :<|> ioMaybeToExceptT err401 . return . logOff
 
 tokenKey :: Text
 tokenKey = "secret-key"
+
+verifyClaims :: [Claim] -> Maybe String -> Bool
+verifyClaims claims maybeToken = claimsContainAtLeastOne claims (maybeTokenToClaims maybeToken)
 
 claimsToToken :: [Claim] -> Token
 claimsToToken claims = Token {token = encodedClaims}
@@ -74,9 +70,9 @@ claimsToToken claims = Token {token = encodedClaims}
         key = JWT.secret tokenKey
         claimToText x = (pack . show $ x ,Bool True)
 
-maybeTokenToClaims :: Maybe Text -> [Claim]
+maybeTokenToClaims :: Maybe String -> [Claim]
 maybeTokenToClaims Nothing = []
-maybeTokenToClaims (Just token) = case JWT.decodeAndVerifySignature key token of
+maybeTokenToClaims (Just token) = case JWT.decodeAndVerifySignature key (pack token) of
     Just verifiedClaims ->
       map textToClaim . toList . JWT.unregisteredClaims . JWT.claims $ verifiedClaims
     Nothing -> []

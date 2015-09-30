@@ -8,7 +8,13 @@ import           Lib.DB.Admin
 import           Lib.ServantHelpers
 import           Servant.API
 
-type AdminAPI = "admin" :> "builddatabase" :> Get '[JSON] String
+import           App.AuthServer(verifyClaims,AuthHeader)
+import           Lib.Authorization(Claim(SuperAdmin))
+
+type AdminAPI = AuthHeader :> ("admin" :> "builddatabase" :> Get '[JSON] String)
 
 adminServer :: Server AdminAPI
-adminServer = liftIO buildDatabase
+adminServer maybeToken =
+              if verifyClaims [SuperAdmin] maybeToken
+                then liftIO buildDatabase
+                else throwE err401
