@@ -1,7 +1,7 @@
 module DB.Authorization where
 
-import Domain.Authentication
-import Domain.Authorization
+import           Domain.Authentication
+import           Domain.Authorization
 
 -- TODO: get this from DB/google docs/whatever...
 maybeIdentityToClaims :: Maybe IdentityId -> [Claim]

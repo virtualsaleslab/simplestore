@@ -1,10 +1,11 @@
-{-#LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject) where
 
-import Domain.Models
-import Lib.DB
-import Database.SQLite.Simple.FromField(fromField)
+import           Config                           (dbName)
+import           Database.SQLite.Simple.FromField (fromField)
+import           Domain.Models
+import           Lib.DB
 
 instance FromRow ProjectListItem where
     fromRow = ProjectListItem <$> field <*> field <*> field

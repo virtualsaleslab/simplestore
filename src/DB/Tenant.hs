@@ -1,10 +1,11 @@
-{-#LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module DB.Tenant(getTenants,findTenant,insertTenant,deleteTenant) where
 
-import Domain.Models
-import Lib.DB
-import Database.SQLite.Simple.FromField(fromField)
+import           Config                           (dbName)
+import           Database.SQLite.Simple.FromField (fromField)
+import           Domain.Models
+import           Lib.DB
 
 instance FromRow Tenant where
     fromRow = Tenant <$> field <*> field

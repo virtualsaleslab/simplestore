@@ -1,10 +1,9 @@
-{-#LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module DB.Admin(buildDatabase) where
 
-import Domain.Models
-import Lib.DB
-import Database.SQLite.Simple.FromField(fromField)
+import           Config (dbName)
+import           Lib.DB
 
 buildDatabase :: IO String
 buildDatabase = do
