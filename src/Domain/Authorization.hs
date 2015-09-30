@@ -1,8 +1,6 @@
-module Lib.Authorization where
+module Domain.Authorization where
 
 import Domain.Models(IdentityId,TenantId,ProjectId)
-
-import Data.List(intersect)
 
 data TenantSpec = AllTenants | SpecificTenant TenantId deriving (Eq,Show,Read)
 data TenantRole = TenantAdmin deriving (Eq,Show,Read)
@@ -15,15 +13,6 @@ data Claim = TenantClaim TenantRole TenantSpec
           | IdentityClaim IdentityId
           | SuperAdmin
           deriving (Eq,Show,Read)
-
-aTenantId :: TenantId
-aTenantId = 1
-
-anotherTenantId :: TenantId
-anotherTenantId = 2
-
-aProjectId :: ProjectId
-aProjectId = 3
 
 -- TODO: get this from DB/google docs/whatever...
 maybeIdentityToClaims :: Maybe IdentityId -> [Claim]
@@ -44,6 +33,7 @@ maybeIdentityToClaims identity =
                     , ProjectClaim ProjectReviewer $ SpecificProject aProjectId
                     ]
     otherwise    -> []
-
-claimsContainAtLeastOne :: [Claim] -> [Claim] -> Bool
-claimsContainAtLeastOne set items = not . null $ set `intersect` items
+  where
+      aTenantId = 1
+      anotherTenantId = 2
+      aProjectId = 3
