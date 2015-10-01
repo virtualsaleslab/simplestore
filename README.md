@@ -1,6 +1,6 @@
 # simplestore
 
-The goal of this project is to have a multi-tennant storage service for projects.
+The goal of this project is to have a multi-tenant storage service for projects.
 
 I know things like mongo-db exist, but I would like to figure out if I can use
 this as a base for a more extensive server-side app.
