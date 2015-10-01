@@ -3,7 +3,7 @@ module Main(main) where
 import Network.Wai              (Application)
 import Network.Wai.Handler.Warp (run)
 import Servant                  (serve)
-import App.MainServer
+import Servers.MainServer
 
 app :: Application
 app = serve mainAPI mainServer

@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
-module App.TenantServer(TenantAPI,tenantServer) where
+module Servers.TenantServer(TenantAPI,tenantServer) where
 
 import           DB.Tenant
 import           Lib.ServantHelpers

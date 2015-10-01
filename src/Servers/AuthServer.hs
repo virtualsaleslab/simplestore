@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module App.AuthServer(AuthAPI,authServer) where
+module Servers.AuthServer(AuthAPI,authServer) where
 
 import           Config                   (tokenKey)
 import           Data.Aeson

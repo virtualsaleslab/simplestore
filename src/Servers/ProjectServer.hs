@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module App.ProjectServer(ProjectAPI,projectServer,ioMaybeToExceptT) where
+module Servers.ProjectServer(ProjectAPI,projectServer,ioMaybeToExceptT) where
 
 import           Data.Aeson         (FromJSON, ToJSON, object, toJSON, (.=))
 import           Domain.Models

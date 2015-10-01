@@ -1,12 +1,12 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
-module App.MainServer where
+module Servers.MainServer where
 
-import           App.AdminServer
-import           App.AuthServer
-import           App.ProjectServer
-import           App.TenantServer
+import           Servers.AdminServer
+import           Servers.AuthServer
+import           Servers.ProjectServer
+import           Servers.TenantServer
 import           Lib.ServantHelpers
 import           Servant.API
 

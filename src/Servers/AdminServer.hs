@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module App.AdminServer(AdminAPI,adminServer) where
+module Servers.AdminServer(AdminAPI,adminServer) where
 
 import           DB.Admin
 import           Lib.ServantHelpers
