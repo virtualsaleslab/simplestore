@@ -5,8 +5,8 @@
 module Servers.ProjectServer(ProjectAPI,projectServer,ioMaybeToExceptT) where
 
 import           Data.Aeson         (FromJSON, ToJSON, object, toJSON, (.=))
-import           Domain.Models
 import           DB.Project
+import           Domain.Models
 import           Lib.ServantHelpers
 import           Servant.API
 

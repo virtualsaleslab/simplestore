@@ -1,8 +1,8 @@
-{-# LANGUAGE OverloadedStrings#-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module GetOpts  where
 
-import Options.Applicative
+import           Options.Applicative
 
 data ServerOptions = ServerOptions
     { optPort :: Int
@@ -35,7 +35,7 @@ data UserOptions = UserOptions
       }
 
 data UserPassOptions = UserPassOptions
-      { optUserPassNames :: [String]
+      { optUserPassNames  :: [String]
       , optUserPassPasswd :: String
       }
 
@@ -45,7 +45,7 @@ mkUserPassOptions = mkuserpass
                   <*> strOption
                     (  long "password"
                     <> short 'p'
-                    <> help "The password to use"
+                    <> help "The password to use (required)"
                   )
   where mkuserpass x y = MkUser $ UserPassOptions x y
 

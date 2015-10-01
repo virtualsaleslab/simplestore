@@ -4,9 +4,9 @@ module DB.Authentication where
 
 import           Config                           (dbName)
 import           Database.SQLite.Simple.FromField (fromField)
+import           Domain.Authentication            (IdentityId)
+import           Domain.Models                    (User (..), UserId)
 import           Lib.DB
-import           Domain.Authentication (IdentityId)
-import           Domain.Models(User(..),UserId)
 
 
 instance FromRow User where

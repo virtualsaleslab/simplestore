@@ -2,10 +2,10 @@
 
 module DB.Admin(resetDatabase) where
 
-import           Config (dbName)
+import           Config           (dbName)
+import           Control.Monad    (when)
 import           Lib.DB
-import System.Directory(doesFileExist,removeFile)
-import Control.Monad(when)
+import           System.Directory (doesFileExist, removeFile)
 
 resetDatabase :: IO String
 resetDatabase = do

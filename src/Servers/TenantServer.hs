@@ -3,11 +3,11 @@
 
 module Servers.TenantServer(TenantAPI,tenantServer) where
 
+import           Data.Aeson         (FromJSON, ToJSON)
 import           DB.Tenant
-import           Lib.ServantHelpers
 import           Domain.Models
+import           Lib.ServantHelpers
 import           Servant.API
-import           Data.Aeson   (FromJSON, ToJSON)
 
 instance ToJSON Tenant
 instance FromJSON Tenant

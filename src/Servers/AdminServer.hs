@@ -4,12 +4,12 @@
 
 module Servers.AdminServer(AdminAPI,adminServer) where
 
+import           Config                   (tokenKey)
 import           DB.Admin
-import           Lib.ServantHelpers
-import           Servant.API
 import           Domain.Authorization     (Claim (SuperAdmin))
 import           Lib.Authorization.Claims (AuthHeader, verifyClaims)
-import           Config               (tokenKey)
+import           Lib.ServantHelpers
+import           Servant.API
 
 type AdminAPI = AuthHeader :> ("admin" :> "resetdatabase" :> Get '[JSON] String)
 

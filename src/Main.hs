@@ -1,18 +1,18 @@
 module Main(main) where
 
-import Network.Wai              (Application)
-import Network.Wai.Handler.Warp (run)
-import Servant                  (serve)
-import Servers.MainServer
-import Lib.ServantHelpers(liftIO)
+import           Lib.ServantHelpers       (liftIO)
+import           Network.Wai              (Application)
+import           Network.Wai.Handler.Warp (run)
+import           Servant                  (serve)
+import           Servers.MainServer
 
-import GetOpts
-import Options.Applicative
+import           GetOpts
+import           Options.Applicative
 
-import DB.Admin(resetDatabase)
-import DB.Authentication(createUser)
+import           DB.Admin                 (resetDatabase)
+import           DB.Authentication        (createUser)
 
-import Domain.Models(userId,userIdentityId)
+import           Domain.Models            (userId, userIdentityId)
 
 runServer :: ServerOptions -> Options -> IO ()
 runServer opt gOpt = do

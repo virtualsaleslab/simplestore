@@ -3,9 +3,8 @@
 
 module Domain.Models where
 
-import           GHC.Generics (Generic)
-
-import Domain.Authentication(IdentityId)
+import           GHC.Generics          (Generic)
+import           Domain.Authentication (IdentityId)
 
 type Name = String
 type Description = String
