@@ -14,18 +14,18 @@ resetDatabase = do
   conn <- open dbName
   execute_ conn "CREATE TABLE IF NOT EXISTS tenant (\
                     \id          INTEGER PRIMARY KEY, \
-                    \name        TEXT)"
+                    \name        TEXT NOT NULL UNIQUE)"
   execute_ conn "CREATE TABLE IF NOT EXISTS project (\
                     \id          INTEGER PRIMARY KEY, \
-                    \tenantId    INTEGER, \
+                    \tenantId    INTEGER , \
                     \description TEXT, \
                     \content     TEXT)"
   execute_ conn "CREATE TABLE IF NOT EXISTS user (\
                     \id          INTEGER PRIMARY KEY, \
-                    \name        TEXT, \
+                    \name        TEXT NOT NULL, \
                     \passSalt    TEXT, \
                     \passHash    TEXT, \
-                    \identityId  INTEGER )"
+                    \identityId  INTEGER  NOT NULL UNIQUE)"
   execute_ conn "CREATE TABLE IF NOT EXISTS identity (\
                     \id          INTEGER PRIMARY KEY, \
                     \name        TEXT)"

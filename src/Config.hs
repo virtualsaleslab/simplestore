@@ -5,4 +5,4 @@ tokenKey = "secret-key"
 
 
 dbName :: String
-dbName = "test.db"
+dbName = "simplestore.db"

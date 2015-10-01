@@ -1,11 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject) where
+module DB.Project(getProjectListForTenant,findProject,insertProject,deleteProject,ProjectListItem(..)) where
 
 import           Config                           (dbName)
 import           Database.SQLite.Simple.FromField (fromField)
 import           Domain.Models
 import           Lib.DB
+
+
+
+data ProjectListItem = ProjectListItem
+  { projectListItemId          :: ProjectId
+  , projectListItemTenantId    :: TenantId
+  , projectListItemDescription :: Description
+  }
+  deriving Show
 
 instance FromRow ProjectListItem where
     fromRow = ProjectListItem <$> field <*> field <*> field

@@ -21,7 +21,7 @@ instance ToJSON ProjectListItem where
            ]
 
 type ProjectAPI  =  "tenants" :> Capture "tId" TenantId :> "projects" :> (
-                    Get '[JSON] ProjectList
+                    Get '[JSON] [ProjectListItem]
                :<|> Capture "pId" ProjectId :> Get '[JSON] Project
                :<|> ReqBody '[JSON] Project :> Post '[JSON] Project
                :<|> Capture "pId" ProjectId :> Delete '[JSON] ProjectId

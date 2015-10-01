@@ -13,7 +13,7 @@ instance ToJSON Tenant
 instance FromJSON Tenant
 
 type TenantAPI  =  "tenants" :> (
-                   Get '[JSON] Tenants
+                   Get '[JSON] [Tenant]
               :<|> Capture "tId" TenantId :> Get '[JSON] Tenant
               :<|> ReqBody '[JSON] Tenant :> Post '[JSON] Tenant
               :<|> Capture "tId" TenantId :> Delete '[JSON] TenantId)

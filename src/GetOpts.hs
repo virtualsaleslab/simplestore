@@ -1,12 +1,11 @@
+{-# LANGUAGE OverloadedStrings#-}
+
 module GetOpts  where
 
 import Options.Applicative
 
-data Command = ResetDatabase ResetDatabaseOptions
-             | Server ServerOptions
-
 data ServerOptions = ServerOptions
-    { port :: Int
+    { optPort :: Int
     }
 
 serverOptions :: Parser Command
@@ -19,35 +18,72 @@ serverOptions = Server . ServerOptions
             <> help "Port to run the server on"
             )
 
-data ResetDatabaseOptions = ResetDatabaseOptions
-    { force :: Bool
+data ResetDBOptions = ResetDBOptions
+    { optResetDBForce :: Bool
     }
 
 resetDatabaseOptions :: Parser Command
-resetDatabaseOptions = ResetDatabase . ResetDatabaseOptions
+resetDatabaseOptions = ResetDB . ResetDBOptions
     <$> switch
        (  long "force"
        <> short 'f'
        <> help  "Force execution of the reset"
        )
 
+data UserOptions = UserOptions
+      { optUserNames :: [String]
+      }
+
+data UserPassOptions = UserPassOptions
+      { optUserPassNames :: [String]
+      , optUserPassPasswd :: String
+      }
+
+mkUserPassOptions :: Parser Command
+mkUserPassOptions = mkuserpass
+                  <$> some (argument str (metavar "USERNAMES..."))
+                  <*> strOption
+                    (  long "password"
+                    <> short 'p'
+                    <> help "The password to use"
+                  )
+  where mkuserpass x y = MkUser $ UserPassOptions x y
+
+
+
+
+-- rmUserOptions :: Parser Command
+-- rmUserOptions = RmUser . UserOptions <$> some (argument str (metavar "USERNAMES..."))
+--
+-- passwdUserOptions :: Parser Command
+-- passwdUserOptions = PassWdUser . UserOptions <$> some (argument str (metavar "USERNAMES..."))
+
+data QueryOptions = QueryOptions { optQueryString :: String }
+
+-- queryOptions :: Parser QueryOptions
+-- queryOptions = QueryOptions <$> argument str $ metavar "QUERY"
+
+data Command = Server ServerOptions
+             | ResetDB ResetDBOptions
+             | MkUser UserPassOptions
+            --  | RmUser UserOptions
+            --  | PassWdUser UserOptions
+
 data Options = Options
-   { optGlobalDBName :: String
-   , optCommand :: Command
+   { optCommand :: Command
    }
 
 options :: Parser Options
 options = Options
-    <$> strOption
-       (   long "dbname"
-        <> short 'd'
-        <> value "test.db"
-        <> help "The filename of the Sqlite database to use"
-        <> metavar "DBNAME"
-       )
-    <*> subparser (
-           command "resetdatabase" (info resetDatabaseOptions
-             (progDesc "Reset the server. Use --force to execute"))
-        <> command "server" (info serverOptions
-             (progDesc "Start a webserver"))
-        )
+    <$> subparser (
+        command "server"  (info serverOptions
+                          (progDesc "Start a webserver"))
+     <> command "resetdb" (info resetDatabaseOptions
+                          (progDesc "Reset the server. Use --force to execute"))
+     <> command "mkuser"  (info mkUserPassOptions
+                          (progDesc "Add one or more users"))
+    --  <> command "rmuser"  (info rmUserOptions
+    --                       (progDesc "remove one or more users"))
+    --  <> command "passwd"  (info passwdUserOptions
+    --                       (progDesc "change password for one or more users"))
+    )

@@ -4,27 +4,46 @@ import Network.Wai              (Application)
 import Network.Wai.Handler.Warp (run)
 import Servant                  (serve)
 import Servers.MainServer
+import Lib.ServantHelpers(liftIO)
 
 import GetOpts
 import Options.Applicative
 
 import DB.Admin(resetDatabase)
+import DB.Authentication(createUser)
+
+import Domain.Models(userId)
 
 runServer :: ServerOptions -> Options -> IO ()
 runServer opt gOpt = do
-    let p = port opt
+    let p = optPort opt
     putStrLn $ "Running webserver on port " ++ show p
     run p $ serve mainAPI mainServer
 
-runResetDB :: ResetDatabaseOptions -> Options -> IO ()
-runResetDB opts gOpts = if force opts
+runResetDB :: ResetDBOptions -> Options -> IO ()
+runResetDB opts gOpts = if optResetDBForce opts
     then resetDatabase >>= putStrLn
     else putStrLn "Use the --force option if you want this to work"
 
+runMkUser :: UserPassOptions -> Options -> IO ()
+runMkUser opts gOpts = mapM_ (liftIO . createuser) $ optUserPassNames opts
+  where
+      pass = optUserPassPasswd opts
+      createuser name = do
+          u <- createUser name pass
+          putStrLn $ case u of
+            Nothing -> "Creation of user " ++ name ++ "failed"
+            Just u -> "User " ++ name ++ " created, id = " ++ show (userId u)
+
+
+
 runCommand :: Options -> IO ()
 runCommand opts = case optCommand opts of
-  Server        x -> runServer x opts
-  ResetDatabase x -> runResetDB x opts
+  Server     x -> runServer     x opts
+  ResetDB    x -> runResetDB    x opts
+  MkUser     x -> runMkUser     x opts
+  -- RmUser     x -> runRmUser     x opts
+  -- PassWdUser x -> runPasswdUser x opts
 
 main :: IO ()
 main = execParser opts >>= runCommand
