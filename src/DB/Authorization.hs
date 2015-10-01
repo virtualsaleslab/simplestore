@@ -7,15 +7,15 @@ import           Domain.Authorization
 maybeIdentityToClaims :: Maybe IdentityId -> [Claim]
 maybeIdentityToClaims identity =
   case identity of
-    Just "tom"   -> [ IdentityClaim "tom"
+    Just 1   -> [ IdentityClaim 1
                     , TenantClaim  TenantAdmin       AllTenants
                     , ProjectClaim ProjectEditor     AllProjects
                     , SuperAdmin
                     ]
-    Just "yves"  -> [ IdentityClaim "yves"
+    Just 2  -> [ IdentityClaim 2
                     , ProjectClaim ProjectReviewer $ AllTenantProjects aTenantId
                     ]
-    Just "marco" -> [ IdentityClaim "marco"
+    Just 3 -> [ IdentityClaim 3
                     , TenantClaim TenantAdmin      $ SpecificTenant aTenantId
                     , ProjectClaim ProjectEditor   $ OwnTenantProjects aTenantId
                     , ProjectClaim ProjectReviewer $ AllTenantProjects anotherTenantId

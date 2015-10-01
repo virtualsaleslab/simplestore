@@ -12,7 +12,7 @@ import Options.Applicative
 import DB.Admin(resetDatabase)
 import DB.Authentication(createUser)
 
-import Domain.Models(userId)
+import Domain.Models(userId,userIdentityId)
 
 runServer :: ServerOptions -> Options -> IO ()
 runServer opt gOpt = do
@@ -33,7 +33,14 @@ runMkUser opts gOpts = mapM_ (liftIO . createuser) $ optUserPassNames opts
           u <- createUser name pass
           putStrLn $ case u of
             Nothing -> "Creation of user " ++ name ++ "failed"
-            Just u -> "User " ++ name ++ " created, id = " ++ show (userId u)
+            Just u -> mconcat
+                        [ "User "
+                        , name
+                        ," created, id = "
+                        , show (userId u)
+                        ,", identityId = "
+                        , show (userIdentityId u)
+                        ]
 
 
 

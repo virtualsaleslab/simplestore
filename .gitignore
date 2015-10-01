@@ -14,4 +14,4 @@ cabal.sandbox.config
 *.aux
 *.hp
 .stack-work/
-test.db
+simplestore.db

@@ -16,7 +16,7 @@ instance FromRow User where
 maybeUserIdentity :: String -> String -> Maybe IdentityId
 maybeUserIdentity username "pass" =
                     if username `elem` ["tom","yves","marco"]
-                      then Just username
+                      then Just 1
                       else Nothing
 maybeUserIdentity _ _ = Nothing
 
@@ -24,14 +24,17 @@ maybeUserIdentity _ _ = Nothing
 -- TODO : proper salting + hashing of passwords
 createUser :: String -> String -> IO (Maybe User)
 createUser name pass =
-    insertUser $ User 1 name pass "salt" name
+    insertUser $ User 1 name pass "salt" 1
 
 insertUser :: User -> IO (Maybe User)
 insertUser (User _id name passSalt passHash identity) = do
      conn <- open dbName
+     execute conn "INSERT INTO identity\
+                  \(name) values (?)" [name]
+     iId  <- lastInsertRowId conn
      execute conn "INSERT INTO user\
                   \(name,passSalt,passHash,identityId) values (?,?,?,?)"
-                  (name,passHash,passSalt,identity)
+                  (name,passHash,passSalt,iId)
      uId  <- lastInsertRowId conn
      findUser' conn $ fromIntegral uId
 

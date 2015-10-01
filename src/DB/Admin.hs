@@ -25,10 +25,10 @@ resetDatabase = do
                     \name        TEXT NOT NULL, \
                     \passSalt    TEXT, \
                     \passHash    TEXT, \
-                    \identityId  INTEGER  NOT NULL UNIQUE)"
+                    \identityId  INTEGER)"
   execute_ conn "CREATE TABLE IF NOT EXISTS identity (\
                     \id          INTEGER PRIMARY KEY, \
-                    \name        TEXT)"
+                    \name        TEXT UNIQUE)"
   execute_ conn "CREATE TABLE IF NOT EXISTS claim (\
                     \id          INTEGER PRIMARY KEY, \
                     \identityId  INTEGER, \

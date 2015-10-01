@@ -1,4 +1,4 @@
 module Domain.Authentication where
 
 
-type IdentityId = String
+type IdentityId = Int
