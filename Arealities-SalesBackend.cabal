@@ -33,7 +33,8 @@ executable Arealities-SalesBackend
                        bytestring,
                        text,
                        jwt,
-                       containers
+                       containers,
+                       optparse-applicative
   hs-source-dirs:      src
                        servant
   default-language:    Haskell2010
