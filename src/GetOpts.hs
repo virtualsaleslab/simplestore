@@ -17,7 +17,7 @@ serverOptions = Server . ServerOptions
             <> value 8081
             <> metavar "PORT"
             <> help "Port to run the server on"
-            ) 
+            )
 
 data ResetDatabaseOptions = ResetDatabaseOptions
     { force :: Bool

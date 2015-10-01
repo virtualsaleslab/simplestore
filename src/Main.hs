@@ -7,9 +7,8 @@ import Servers.MainServer
 
 import GetOpts
 import Options.Applicative
-import Lib.ServantHelpers(liftIO)
 
-import DB.Admin(buildDatabase)
+import DB.Admin(resetDatabase)
 
 runServer :: ServerOptions -> Options -> IO ()
 runServer opt gOpt = do
@@ -19,7 +18,7 @@ runServer opt gOpt = do
 
 runResetDB :: ResetDatabaseOptions -> Options -> IO ()
 runResetDB opts gOpts = if force opts
-    then buildDatabase >>= putStrLn
+    then resetDatabase >>= putStrLn
     else putStrLn "Use the --force option if you want this to work"
 
 runCommand :: Options -> IO ()
