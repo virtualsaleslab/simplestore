@@ -3,10 +3,11 @@
 
 module Domain.Models where
 
-import           GHC.Generics          (Generic)
 import           Domain.Authentication (IdentityId)
+import           GHC.Generics          (Generic)
 
 type Name = String
+type Password = String
 type Description = String
 type Content = String
 type TenantId = Int
@@ -29,7 +30,7 @@ data Project = Project
 
 data User = User
   { userId           :: UserId
-  , userName         :: String
+  , userName         :: Name
   , userPasswordSalt :: String
   , userPasswordHash :: String
   , userIdentityId   :: IdentityId

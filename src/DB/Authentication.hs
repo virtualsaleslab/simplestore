@@ -5,8 +5,10 @@ module DB.Authentication where
 import           Config                           (dbName)
 import           Database.SQLite.Simple.FromField (fromField)
 import           Domain.Authentication            (IdentityId)
-import           Domain.Models                    (User (..), UserId)
+import           Domain.Models                    (User (..), UserId(..),userIdentityId)
 import           Lib.DB
+import           Control.Monad.IO.Class(liftIO)
+import Data.Functor(void)
 
 
 instance FromRow User where
@@ -25,6 +27,21 @@ maybeUserIdentity _ _ = Nothing
 createUser :: String -> String -> IO (Maybe User)
 createUser name pass =
     insertUser $ User 1 name pass "salt" 1
+
+removeUser :: UserId -> IO ()
+removeUser userId = do
+      conn <- open dbName
+      findUser' conn userId >>= deleteFromDb conn >> close conn
+      where deleteFromDb conn (Just usr) =
+              execute conn "DELETE FROM identity WHERE id = ?;\
+                           \DELETE FROM user WHERE id = ?" (userIdentityId usr, userId)
+            deleteFromDb _ _ = return ()
+
+changePasswordForUser :: UserId -> String -> IO ()
+changePasswordForUser userId pass = do
+    conn <- open dbName
+    execute conn "UPDATE user SET pass = ? WHERE id = ?" (pass,userId)
+    close conn
 
 insertUser :: User -> IO (Maybe User)
 insertUser (User _id name passSalt passHash identity) = do

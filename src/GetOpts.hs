@@ -2,88 +2,77 @@
 
 module GetOpts  where
 
+import           Domain.Models       (UserId)
 import           Options.Applicative
 
-data ServerOptions = ServerOptions
-    { optPort :: Int
-    }
+data RunServerOpts  = RunServerOpts  { runServerPort :: Int
+                                     }
+data ResetDBOpts    = ResetDBOpts    { resetDBForce :: Bool
+                                     }
+data CreateUserOpts = CreateUserOpts { createUserNames    :: [String]
+                                     , createUserPassword :: String
+                                     }
+data RemoveUserOpts = RemoveUserOpts { removeUserIds :: [UserId]
+                                     }
+data ChangePassOpts = ChangePassOpts { changePassUserIds  :: [UserId]
+                                     , changePassPassword :: String
+                                     }
 
-serverOptions :: Parser Command
-serverOptions = Server . ServerOptions
-      <$>  option auto
-            ( long "port"
-            <> short 'p'
-            <> value 8081
-            <> metavar "PORT"
-            <> help "Port to run the server on"
+data OptionCommand = RunServer   RunServerOpts
+                   | ResetDB     ResetDBOpts
+                   | CreateUser  CreateUserOpts
+                   | RemoveUser  RemoveUserOpts
+                   | ChangePass  ChangePassOpts
+
+data Options = Options { optCommand :: OptionCommand }
+
+parseArgsToCommands :: IO OptionCommand
+parseArgsToCommands =  execParser options >>= runOptions
+  where
+    runOptions (Options cmd)= return cmd
+    options =
+      info
+        ( helper <*> commandOptions )
+        (  header "SimpleStorage by arealities.com"
+        <> progDesc "A simple multi-tenant storage accessible over HTTP. Run with -h to view available commands\n"
+        <> fullDesc
+        )
+    commandOptions  =
+      Options
+        <$> subparser (
+            defCommand "server"  runServerOpts  "Start a webserver" <>
+            defCommand "resetdb" resetDBOpts    "Reset the database" <>
+            defCommand "mkuser"  createUserOpts "Add one or more users" <>
+            defCommand "rmuser"  removeUserOpts "remove one or more users" <>
+            defCommand "passwd"  changePassOpts "change password for one or more users"
             )
-
-data ResetDBOptions = ResetDBOptions
-    { optResetDBForce :: Bool
-    }
-
-resetDatabaseOptions :: Parser Command
-resetDatabaseOptions = ResetDB . ResetDBOptions
-    <$> switch
-       (  long "force"
-       <> short 'f'
-       <> help  "Force execution of the reset"
-       )
-
-data UserOptions = UserOptions
-      { optUserNames :: [String]
-      }
-
-data UserPassOptions = UserPassOptions
-      { optUserPassNames  :: [String]
-      , optUserPassPasswd :: String
-      }
-
-mkUserPassOptions :: Parser Command
-mkUserPassOptions = mkuserpass
-                  <$> some (argument str (metavar "USERNAMES..."))
-                  <*> strOption
-                    (  long "password"
-                    <> short 'p'
-                    <> help "The password to use (required)"
-                  )
-  where mkuserpass x y = MkUser $ UserPassOptions x y
-
-
-
-
--- rmUserOptions :: Parser Command
--- rmUserOptions = RmUser . UserOptions <$> some (argument str (metavar "USERNAMES..."))
---
--- passwdUserOptions :: Parser Command
--- passwdUserOptions = PassWdUser . UserOptions <$> some (argument str (metavar "USERNAMES..."))
-
-data QueryOptions = QueryOptions { optQueryString :: String }
-
--- queryOptions :: Parser QueryOptions
--- queryOptions = QueryOptions <$> argument str $ metavar "QUERY"
-
-data Command = Server ServerOptions
-             | ResetDB ResetDBOptions
-             | MkUser UserPassOptions
-            --  | RmUser UserOptions
-            --  | PassWdUser UserOptions
-
-data Options = Options
-   { optCommand :: Command
-   }
-
-options :: Parser Options
-options = Options
-    <$> subparser (
-        command "server"  (info serverOptions
-                          (progDesc "Start a webserver"))
-     <> command "resetdb" (info resetDatabaseOptions
-                          (progDesc "Reset the server. Use --force to execute"))
-     <> command "mkuser"  (info mkUserPassOptions
-                          (progDesc "Add one or more users"))
-    --  <> command "rmuser"  (info rmUserOptions
-    --                       (progDesc "remove one or more users"))
-    --  <> command "passwd"  (info passwdUserOptions
-    --                       (progDesc "change password for one or more users"))
-    )
+    runServerOpts =
+      RunServer . RunServerOpts
+        <$>  option auto
+           (  long "port" <> short 'p'  <> metavar "PORT" <> value 8081
+           <> help "Port to run the server on"
+           )
+    resetDBOpts =
+      ResetDB . ResetDBOpts
+        <$> switch
+          (  long "force" <> short 'f'
+          <> help  "Force execution of the reset (required)"
+          )
+    createUserOpts =
+      (\x y -> CreateUser $ CreateUserOpts x y)
+        <$> some (argument str (metavar "USERNAMES..."))
+        <*> strOption
+          (  long "password" <> short 'p' <> metavar "PASSWORD"
+          <> help "The password to use (required)"
+          )
+    removeUserOpts =
+      RemoveUser . RemoveUserOpts
+        <$> some (argument auto (metavar "USERIDs..."))
+    changePassOpts =
+      (\x y -> ChangePass $ ChangePassOpts x y)
+        <$> some (argument auto (metavar "USERIDs..."))
+        <*> strOption
+          (  long "password" <> short 'p' <> metavar "PASSWORD"
+          <> help "The password to use (required)"
+          )
+    defCommand cmd what desc = command cmd (info what (progDesc desc))
