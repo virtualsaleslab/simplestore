@@ -16,16 +16,16 @@ import           Servers.MainServer
 
 runCommand :: OptionCommand -> IO ()
 
-runCommand (ResetDB (ResetDBOpts force)) =
+runCommand (ResetDB force) =
   if force
     then resetDatabase >>= putStrLn
     else putStrLn "Use the --force option if you want this to work"
 
-runCommand (RunServer (RunServerOpts port)) = do
+runCommand (RunServer port) = do
     putStrLn $ "Running webserver on port " ++ show port
     run port $ serve mainAPI mainServer
 
-runCommand (CreateUser (CreateUserOpts usernames pass)) =
+runCommand (CreateUser usernames pass) =
     mapM_ (liftIO . handleCreateUser) usernames
     where handleCreateUser name =
             createUser name pass >>= putStrLn . status
@@ -35,13 +35,13 @@ runCommand (CreateUser (CreateUserOpts usernames pass)) =
                                   show (userId usr) ++ ", identityId = " ++
                                   show (userIdentityId usr)
 
-runCommand (RemoveUser (RemoveUserOpts userIds)) =
+runCommand (RemoveUser userIds) =
     mapM_ (liftIO . handleRemoveUser) userIds
     where handleRemoveUser uId = do
             putStrLn $ "Removing user with id=" ++ show uId
             removeUser uId
 
-runCommand (ChangePass (ChangePassOpts userIds pass)) =
+runCommand (ChangePass userIds pass) =
   mapM_ (liftIO . handleChangePass) userIds
   where handleChangePass uId = do
           changePasswordForUser uId pass
