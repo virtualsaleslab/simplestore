@@ -15,12 +15,12 @@ instance FromRow User where
     fromRow = User <$> field <*> field <*> field <*> field <*> field
 
 -- TODO: get this from DB/google docs/whatever...
-maybeUserIdentity :: String -> String -> Maybe IdentityId
-maybeUserIdentity username "pass" =
+maybeUserIdentity :: String -> String -> IO (Maybe IdentityId)
+maybeUserIdentity username "pass" = return $
                     if username `elem` ["tom","yves","marco"]
                       then Just 1
                       else Nothing
-maybeUserIdentity _ _ = Nothing
+maybeUserIdentity _ _ = return Nothing
 
 
 -- TODO : proper salting + hashing of passwords
