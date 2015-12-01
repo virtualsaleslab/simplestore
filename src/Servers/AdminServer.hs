@@ -17,4 +17,4 @@ adminServer :: Server AdminAPI
 adminServer maybeToken =
               if verifyClaims tokenKey [SuperAdmin] maybeToken
                 then liftIO resetDatabase
-                else throwE err401
+                else left err401

@@ -37,7 +37,7 @@ getToken User {username = u, password= p} =
     where claims = maybeIdentityToClaims $ maybeUserIdentity u p
 
 authServer :: Server AuthAPI
-authServer = ioMaybeToExceptT err401 . return . getToken
+authServer = ioMaybeToEitherT err401 . return . getToken
 
 -- $ curl http://localhost:8081/auth/token -X POST -H "Content-type: application/json" -d '{"username":"tom","password":"pass"}' -v
 -- * Adding handle: conn: 0x5489b8

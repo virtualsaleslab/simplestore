@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module Servers.ProjectServer(ProjectAPI,projectServer,ioMaybeToExceptT) where
+module Servers.ProjectServer(ProjectAPI,projectServer,ioMaybeToEitherT) where
 
 import           Data.Aeson         (FromJSON, ToJSON, object, toJSON, (.=))
 import           DB.Project
@@ -32,6 +32,6 @@ projectServer :: Server ProjectAPI
 projectServer = projectServerForTenant
   where projectServerForTenant tId =
                  liftIO (getProjectListForTenant tId)
-            :<|> ioMaybeToExceptT err404 . findProject tId
-            :<|> ioMaybeToExceptT err400 . insertProject
+            :<|> ioMaybeToEitherT err404 . findProject tId
+            :<|> ioMaybeToEitherT err400 . insertProject
             :<|> liftIO . deleteProject tId
