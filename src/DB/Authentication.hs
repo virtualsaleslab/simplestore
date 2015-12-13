@@ -4,7 +4,7 @@ module DB.Authentication where
 
 import           Config                           (dbName)
 import           Database.SQLite.Simple.FromField (fromField)
-import           Domain.Authentication            (IdentityId)
+import           Domain.Authentication            (IdentityId, hashPwd, verifyPwd)
 import           Domain.Models                    (User (..), UserId(..),userIdentityId)
 import           Lib.DB
 import           Control.Monad.IO.Class(liftIO)
@@ -16,17 +16,15 @@ instance FromRow User where
 
 -- TODO: get this from DB/google docs/whatever...
 maybeUserIdentity :: String -> String -> IO (Maybe IdentityId)
-maybeUserIdentity username "pass" = return $
-                    if username `elem` ["tom","yves","marco"]
-                      then Just 1
-                      else Nothing
-maybeUserIdentity _ _ = return Nothing
-
+maybeUserIdentity username pass = do
+  user <- findUserByCredentials username pass
+  return $ userIdentityId <$> user
 
 -- TODO : proper salting + hashing of passwords
 createUser :: String -> String -> IO (Maybe User)
-createUser name pass =
-    insertUser $ User 1 name pass "salt" 1
+createUser name pass = do
+    hashed <- hashPwd pass
+    insertUser $ User 1 name hashed "salt" 1
 
 removeUser :: UserId -> IO ()
 removeUser userId = do
@@ -39,8 +37,10 @@ removeUser userId = do
 
 changePasswordForUser :: UserId -> String -> IO ()
 changePasswordForUser userId pass = do
+    hashed <- hashPwd pass
+    let salt = "salt" :: String
     conn <- open dbName
-    execute conn "UPDATE user SET pass = ? WHERE id = ?" (pass,userId)
+    execute conn "UPDATE user SET passHash = ?, passSalt = ? WHERE id = ?" (hashed, salt, userId)
     close conn
 
 insertUser :: User -> IO (Maybe User)
@@ -67,3 +67,23 @@ findUser :: UserId -> IO (Maybe User)
 findUser uId = do
   conn <- open dbName
   findUser' conn uId
+
+findUserByCredentials :: String -> String -> IO (Maybe User)
+findUserByCredentials name password = do
+  conn <- open dbName
+  user <- findUserByName conn name
+  return (validate user password)
+
+validate :: Maybe User -> String -> Maybe User
+validate user password = do
+  user' <- user
+  let isCorrectPassword = verifyPwd (userPasswordHash user') password
+  if isCorrectPassword then user else Nothing
+
+findUserByName :: Connection -> String -> IO (Maybe User)
+findUserByName conn name = do
+  r <- find conn "select id, name, passSalt, passHash, identityId \
+                 \from user \
+                 \where name = ?" [name]
+  close conn
+  return r
