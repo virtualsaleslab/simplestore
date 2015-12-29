@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Servers.AuthServer(AuthAPI,authServer) where
 
@@ -13,6 +14,7 @@ import           GHC.Generics             (Generic)
 import           Lib.Authorization.Claims (claimsToToken)
 import           Lib.ServantHelpers
 import           Servant.API
+import           Control.Monad
 
 data User = User
   { username:: String
@@ -29,15 +31,18 @@ instance ToJSON Token
 
 type AuthAPI = "auth" :> "token" :> ReqBody '[JSON] User :> Post '[JSON] Token
 
-getToken :: User -> Maybe Token
-getToken User {username = u, password= p} =
-    case claims of
+getToken :: User -> IO (Maybe Token)
+getToken User {username = u, password= p} = do
+    userId <- maybeUserIdentity u p
+    claims <- maybeIdentityToClaims userId
+    return $ case claims of
       [] -> Nothing
       x -> Just . Token $ claimsToToken tokenKey claims
-    where claims = maybeIdentityToClaims $ maybeUserIdentity u p
+
 
 authServer :: Server AuthAPI
-authServer = ioMaybeToEitherT err401 . return . getToken
+authServer user =
+  ioMaybeToEitherT err401 $ getToken user
 
 -- $ curl http://localhost:8081/auth/token -X POST -H "Content-type: application/json" -d '{"username":"tom","password":"pass"}' -v
 -- * Adding handle: conn: 0x5489b8
